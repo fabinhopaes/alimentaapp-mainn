@@ -424,7 +424,7 @@ export default function TelaPerfil({ navigation }) {
       >
         <View style={styles.modalFundo}>
           <Pressable
-            style={StyleSheet.absoluteFillObject}
+            style={StyleSheet.absoluteFill}
             onPress={() => {
               if (!saindo) {
                 setModal(null);

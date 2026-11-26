@@ -1516,7 +1516,7 @@ const styles = StyleSheet.create({
   },
 
   fundoModal: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
 
   modalCartao: {

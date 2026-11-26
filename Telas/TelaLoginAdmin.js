@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
   // ======================================
 
   imagemFundo: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     width: "100%",
     height: "100%",
   },

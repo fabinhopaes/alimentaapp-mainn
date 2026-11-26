@@ -1444,7 +1444,7 @@ export default function TelaHome({ navigation, route }) {
       >
         <View style={styles.modalFundo}>
           <Pressable
-            style={StyleSheet.absoluteFillObject}
+            style={StyleSheet.absoluteFill}
             onPress={fecharModal}
           />
 

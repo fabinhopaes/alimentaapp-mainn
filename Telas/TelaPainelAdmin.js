@@ -556,7 +556,7 @@ export default function TelaPainelAdmin({
 
             <Pressable
               style={
-                StyleSheet.absoluteFillObject
+                StyleSheet.absoluteFill
               }
               onPress={() =>
                 setMenuAberto(false)
