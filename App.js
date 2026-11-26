@@ -5,6 +5,7 @@ import React, {
 } from "react";
 
 import {
+  Platform,
   View,
   Text,
   ActivityIndicator,
@@ -16,7 +17,6 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
 import { Ionicons } from "@expo/vector-icons";
-
 import {
   Poppins_400Regular,
   Poppins_500Medium,
@@ -196,10 +196,7 @@ class CapturarErroDeTela extends React.Component {
 // ========================================
 
 export default function App() {
-  const [
-    fontesCarregadas,
-    erroFontes,
-  ] = useFonts({
+  const [, erroFontes] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
     Poppins_600SemiBold,
@@ -207,7 +204,7 @@ export default function App() {
   });
 
   const [sessao, setSessao] = useState({
-    carregando: true,
+    carregando: false,
     usuario: null,
     admin: false,
   });
@@ -224,6 +221,12 @@ export default function App() {
   const estavaLogado = useRef(false);
   const tentativaAdmin = useRef(false);
 
+  useEffect(() => {
+    if (erroFontes) {
+      console.error("Falha ao carregar fontes Poppins:", erroFontes);
+    }
+  }, [erroFontes]);
+
   // ======================================
   // AUTENTICAÇÃO FIREBASE
   // ======================================
@@ -232,10 +235,21 @@ export default function App() {
     let ativo = true;
     let sequencia = 0;
 
+    const limiteSessao = setTimeout(() => {
+      if (ativo) {
+        setSessao({
+          carregando: false,
+          usuario: null,
+          admin: false,
+        });
+      }
+    }, 3000);
+
     const cancelar = onIdTokenChanged(
       auth,
 
       async (conta) => {
+        clearTimeout(limiteSessao);
         const chamada = ++sequencia;
 
         if (!conta) {
@@ -300,6 +314,7 @@ export default function App() {
       },
 
       (erro) => {
+        clearTimeout(limiteSessao);
         console.error(
           "Erro no Firebase Auth:",
           erro
@@ -318,18 +333,10 @@ export default function App() {
     return () => {
       ativo = false;
       sequencia++;
+      clearTimeout(limiteSessao);
       cancelar();
     };
   }, []);
-
-  useEffect(() => {
-    if (erroFontes) {
-      console.error(
-        "Erro ao carregar fontes:",
-        erroFontes
-      );
-    }
-  }, [erroFontes]);
 
   // ======================================
   // NAVEGAÇÃO
@@ -372,8 +379,7 @@ export default function App() {
   // ======================================
 
   if (
-    sessao.carregando ||
-    (!fontesCarregadas && !erroFontes)
+    sessao.carregando
   ) {
     return (
       <SafeAreaProvider>
@@ -398,7 +404,9 @@ export default function App() {
     ? "Home"
     : abrirLoginDireto
     ? "TelaLogin"
-    : "Splash";
+    : Platform.OS === "web"
+    ? "Onboarding"
+    : "TelaCadastro";
 
   const chaveStack = ehAdmin
     ? "admin"

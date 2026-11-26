@@ -561,11 +561,11 @@ export default function TelaCarrinhoDoacoes({ navigation }) {
 
             <View style={styles.resumo}>
               <View style={styles.linhaTotal}>
-                <Text style={styles.rotuloTotal}>Total demonstrativo</Text>
+                <Text style={styles.rotuloTotal}>Total do pedido</Text>
                 <Text style={styles.valorTotal}>{moeda(total)}</Text>
               </View>
               <Text style={styles.aviso}>
-                Nenhum pagamento será cobrado nesta demonstração.
+                Ambiente de testes: nenhuma cobrança será realizada.
               </Text>
               <TouchableOpacity
                 style={[

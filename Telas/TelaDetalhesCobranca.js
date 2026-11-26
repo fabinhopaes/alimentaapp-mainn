@@ -77,7 +77,7 @@ export default function TelaDetalhesCobranca({ navigation, route }) {
           <View style={styles.aviso}>
             <Ionicons name="information-circle-outline" size={22} color={VERDE} />
             <Text style={styles.avisoTexto}>
-              Esta é uma simulação. Nenhum pagamento será cobrado.
+              Ambiente de testes: nenhum pagamento será cobrado.
             </Text>
           </View>
 
@@ -104,11 +104,11 @@ export default function TelaDetalhesCobranca({ navigation, route }) {
               <Text style={styles.valor}>{moeda(precoUnitario)}</Text>
             </View>
             <View style={[styles.linha, styles.linhaTotal]}>
-              <Text style={styles.totalRotulo}>Total demonstrativo</Text>
+              <Text style={styles.totalRotulo}>Total do pedido</Text>
               <Text style={styles.totalValor}>{moeda(subtotal)}</Text>
             </View>
             <Text style={styles.doacaoGratis}>
-              Preços e pagamento são demonstrativos. Nenhum valor será cobrado.
+              Nenhum valor será cobrado neste fluxo.
             </Text>
           </View>
 

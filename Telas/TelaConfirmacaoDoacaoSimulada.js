@@ -56,16 +56,16 @@ export default function TelaConfirmacaoDoacaoSimulada({
           <Ionicons name="checkmark-circle" size={88} color={VERDE_BOTAO} />
         </View>
 
-        <Text style={styles.titulo}>Doação simulada concluída!</Text>
+        <Text style={styles.titulo}>Teste concluído</Text>
         <Text style={styles.mensagem}>
           {pagamento === "pix"
-            ? "Sua simulação foi realizada com sucesso. Nenhuma transferência bancária foi realizada."
-            : "Sua simulação foi realizada com sucesso. Nenhuma cobrança foi efetuada."}
+            ? "Este ambiente não processa pagamentos. Nenhuma transferência foi realizada."
+            : "Este ambiente não processa pagamentos. Nenhuma cobrança foi efetuada."}
         </Text>
 
         <View style={styles.resumo}>
           <View style={styles.linha}>
-            <Text style={styles.rotulo}>Valor original</Text>
+            <Text style={styles.rotulo}>Valor informado</Text>
             <Text style={styles.valor}>
               {formatarReaisCentavos(subtotalCentavos)}
             </Text>
@@ -80,7 +80,7 @@ export default function TelaConfirmacaoDoacaoSimulada({
             <View style={styles.linha}>
               <Text style={styles.rotulo}>Status</Text>
               <Text style={styles.valor}>
-                {status || "Simulação concluída"}
+                {status || "Teste concluído"}
               </Text>
             </View>
           )}
@@ -113,7 +113,7 @@ export default function TelaConfirmacaoDoacaoSimulada({
             </View>
           )}
           <View style={[styles.linha, styles.linhaTotal]}>
-            <Text style={styles.rotuloTotal}>Total simulado</Text>
+            <Text style={styles.rotuloTotal}>Total do teste</Text>
             <Text style={styles.valorTotal}>
               {formatarReaisCentavos(totalCentavos)}
             </Text>

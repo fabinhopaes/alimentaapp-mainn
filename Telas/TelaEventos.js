@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import {
+  ActivityIndicator,
   View,
   Text,
+  Image,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
@@ -11,35 +13,41 @@ import {
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../firebaseDb";
+import { filtrarCampanhas, imagemCampanha } from "../utils/campanhasAdmin";
 
 const VERDE = "#006838";
 const FUNDO = "#FFFCF6";
 
-const INFORMACOES = [
-  {
-    titulo: "Data",
-    valor: "15 de novembro de 2026",
-    icone: "calendar-outline",
-  },
-  {
-    titulo: "Horário",
-    valor: "A partir das 18h",
-    icone: "time-outline",
-  },
-  {
-    titulo: "Local",
-    valor: "Parque Max Feffer, Suzano - SP",
-    icone: "location-outline",
-  },
-  {
-    titulo: "Doação sugerida",
-    valor: "1 kg de alimento não perecível",
-    icone: "heart-outline",
-  },
-];
-
 export default function TelaEventos({ navigation }) {
   const { width } = useWindowDimensions();
+  const [campanhas, setCampanhas] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState("");
+
+  useEffect(() => onSnapshot(
+    collection(db, "campanhas"),
+    (snapshot) => {
+      const lista = snapshot.docs.map((documento) => ({
+        ...documento.data(),
+        id: documento.id,
+      }));
+
+      setCampanhas(
+        filtrarCampanhas(lista).filter(
+          (campanha) => campanha.status === "Ativa"
+        )
+      );
+      setCarregando(false);
+      setErro("");
+    },
+    (falha) => {
+      console.error("Erro ao carregar eventos e campanhas:", falha);
+      setErro("Não foi possível carregar as iniciativas agora.");
+      setCarregando(false);
+    }
+  ), []);
 
   return (
     <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
@@ -66,65 +74,57 @@ export default function TelaEventos({ navigation }) {
           </View>
 
           <Text style={styles.subtitulo}>
-            Participe e ajude a transformar vidas através da música!
+            Acompanhe as iniciativas ativas e veja como participar.
           </Text>
 
-          <View style={styles.banner}>
-            <View style={styles.eventoTag}>
-              <Text style={styles.eventoTagTexto}>EVENTO SOLIDÁRIO</Text>
-            </View>
+          {carregando && (
+            <ActivityIndicator
+              size="large"
+              color={VERDE}
+              style={styles.carregando}
+            />
+          )}
 
-            <View style={styles.iconeEvento}>
-              <Ionicons name="musical-notes" size={58} color="#FFFFFF" />
-            </View>
+          {!!erro && <Text style={styles.estado}>{erro}</Text>}
 
-            <Text style={styles.artista}>LUAN SANTANA</Text>
-          </View>
-
-          <View style={styles.card}>
-            {INFORMACOES.map((item, index) => (
-              <View
-                key={item.titulo}
-                style={[
-                  styles.linha,
-                  index === INFORMACOES.length - 1 && styles.ultimaLinha,
-                ]}
-              >
-                <Ionicons
-                  name={item.icone}
-                  size={21}
-                  color={VERDE}
-                  style={styles.iconeLinha}
-                />
-                <View style={styles.dadosLinha}>
-                  <Text style={styles.rotulo}>{item.titulo}</Text>
-                  <Text style={styles.valor}>{item.valor}</Text>
-                </View>
-              </View>
-            ))}
-          </View>
-
-          <Text style={styles.descricao}>
-            O Show Comunitário do Alimenta+ une música e solidariedade
-            para arrecadar alimentos e apoiar pessoas em situação de
-            vulnerabilidade no Alto Tietê.
-          </Text>
-
-          <TouchableOpacity
-            style={styles.linkCampanhas}
-            onPress={() => navigation.navigate("TelaCampanhas")}
-            accessibilityRole="button"
-          >
-            <Text style={styles.linkCampanhasTexto}>
-              Conheça as campanhas
+          {!carregando && !erro && campanhas.length === 0 && (
+            <Text style={styles.estado}>
+              Não há iniciativas ativas no momento.
             </Text>
-            <Ionicons name="chevron-forward" size={18} color={VERDE} />
-          </TouchableOpacity>
+          )}
 
-          <Text style={styles.aviso}>
-            Evento ilustrativo para demonstração. Confirme data, local e
-            condições com a organização antes de se deslocar.
-          </Text>
+          {campanhas.map((campanha) => (
+            <TouchableOpacity
+              key={campanha.id}
+              style={styles.campanha}
+              onPress={() =>
+                navigation.navigate("TelaDetalheCampanha", { campanha })
+              }
+              accessibilityRole="button"
+              accessibilityLabel={`Abrir ${campanha.nome}`}
+            >
+              {imagemCampanha(campanha) && (
+                <Image
+                  source={imagemCampanha(campanha)}
+                  resizeMode="cover"
+                  style={styles.imagemCampanha}
+                />
+              )}
+              <View style={styles.dadosCampanha}>
+                <Text style={styles.categoria}>{campanha.categoria}</Text>
+                <Text style={styles.nomeCampanha} numberOfLines={2}>
+                  {campanha.nome}
+                </Text>
+                <Text style={styles.descricaoCampanha} numberOfLines={3}>
+                  {campanha.descricao}
+                </Text>
+                <Text style={styles.periodo}>
+                  {campanha.inicio} a {campanha.termino}
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={VERDE} />
+            </TouchableOpacity>
+          ))}
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -170,117 +170,58 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     marginTop: 6,
   },
-  banner: {
-    height: 192,
-    marginTop: 18,
-    borderRadius: 15,
-    backgroundColor: "#B8D7D1",
+  carregando: {
+    marginTop: 32,
+  },
+  estado: {
+    marginTop: 28,
+    color: "#666666",
+    fontFamily: "Poppins_400Regular",
+    fontSize: 14,
+    textAlign: "center",
+  },
+  campanha: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-  },
-  eventoTag: {
-    position: "absolute",
-    top: 12,
-    left: 13,
-    backgroundColor: "#E8F1D9",
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 20,
-  },
-  eventoTagTexto: {
-    color: VERDE,
-    fontFamily: "Poppins_700Bold",
-    fontSize: 11,
-  },
-  iconeEvento: {
-    width: 104,
-    height: 104,
-    borderRadius: 55,
-    backgroundColor: "#448D77",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  artista: {
-    position: "absolute",
-    bottom: 11,
-    left: 13,
-    color: VERDE,
-    backgroundColor: "#E8F1D9",
-    paddingVertical: 4,
-    paddingHorizontal: 9,
-    borderRadius: 20,
-    fontFamily: "Poppins_700Bold",
-    fontSize: 12,
-  },
-  card: {
+    gap: 12,
+    marginTop: 16,
+    padding: 12,
     backgroundColor: "#FFFFFF",
-    borderRadius: 15,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: "#D8DDD6",
-    paddingHorizontal: 14,
-    paddingVertical: 4,
-    marginTop: 16,
-    elevation: 3,
-    shadowColor: "#000000",
-    shadowOpacity: 0.12,
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: 3 },
   },
-  linha: {
-    minHeight: 58,
-    flexDirection: "row",
-    alignItems: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "#D9D9D9",
+  imagemCampanha: {
+    width: 72,
+    height: 72,
+    borderRadius: 6,
+    backgroundColor: "#F0F3ED",
   },
-  ultimaLinha: {
-    borderBottomWidth: 0,
-  },
-  iconeLinha: {
-    marginRight: 10,
-  },
-  dadosLinha: {
+  dadosCampanha: {
     flex: 1,
   },
-  rotulo: {
-    color: VERDE,
-    fontFamily: "Poppins_700Bold",
-    fontSize: 14,
-  },
-  valor: {
-    color: "#666666",
-    fontFamily: "Poppins_400Regular",
-    fontSize: 14,
-  },
-  descricao: {
-    color: "#666666",
-    fontFamily: "Poppins_400Regular",
-    fontSize: 14,
-    lineHeight: 22,
-    textAlign: "center",
-    marginTop: 14,
-  },
-  linkCampanhas: {
-    minHeight: 40,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 5,
-    marginTop: 8,
-  },
-  linkCampanhasTexto: {
+  categoria: {
     color: VERDE,
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 13,
-    textDecorationLine: "underline",
+    fontSize: 11,
   },
-  aviso: {
-    color: "#7B7B72",
+  nomeCampanha: {
+    marginTop: 2,
+    color: "#253226",
+    fontFamily: "Poppins_700Bold",
+    fontSize: 15,
+  },
+  descricaoCampanha: {
+    marginTop: 2,
+    color: "#666666",
+    fontFamily: "Poppins_400Regular",
+    fontSize: 12,
+    lineHeight: 17,
+  },
+  periodo: {
+    marginTop: 4,
+    color: "#58645A",
     fontFamily: "Poppins_400Regular",
     fontSize: 11,
-    lineHeight: 17,
-    textAlign: "center",
-    marginTop: 10,
   },
 });

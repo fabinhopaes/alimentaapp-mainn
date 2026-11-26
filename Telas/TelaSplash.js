@@ -17,7 +17,7 @@ export default function TelaSplash({ navigation }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       navigation.replace("Onboarding");
-    }, 2300);
+    }, 800);
 
     return () => clearTimeout(timer);
   }, [navigation]);
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   },
 
   centro: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "transparent",

@@ -92,12 +92,12 @@ function ResumoPagamento({ tipo, subtotalCentavos, parcelamento }) {
       )}`
     : formatarReaisCentavos(subtotalCentavos);
   const acessibilidade = pix
-    ? `Pagamento via Pix, sem taxas. Valor da doação simulada ${valorPrincipal}. Pagamento à vista.`
+    ? `Contribuição em ambiente de teste via Pix. Valor informado: ${valorPrincipal}. Nenhuma transferência será realizada.`
     : credito
-    ? `Pagamento no crédito. ${selo}. ${valorPrincipal}. Total com juros ${formatarReaisCentavos(
+    ? `Simulação no crédito. ${selo}. ${valorPrincipal}. Total com juros ${formatarReaisCentavos(
         parcelamento.totalCentavos
       )}.`
-    : `Pagamento no débito, sem juros. Você pagará à vista ${valorPrincipal}.`;
+    : `Simulação no débito, sem juros. Valor informado à vista: ${valorPrincipal}.`;
 
   return (
     <View
@@ -129,10 +129,10 @@ function ResumoPagamento({ tipo, subtotalCentavos, parcelamento }) {
         <View style={styles.valoresResumoPagamento}>
           <Text style={styles.textoVocePagara}>
             {pix
-              ? "Valor da doação simulada"
+              ? "Valor da contribuição"
               : credito
-                ? "Você pagará:"
-                : "Você pagará à vista"}
+                ? "Valor no teste:"
+                : "Valor no teste à vista"}
           </Text>
           <Text style={styles.valorResumoPagamento}>{valorPrincipal}</Text>
           {pix && (
@@ -287,7 +287,7 @@ export default function TelaSeuPedido({ navigation, route }) {
     if (pagamento === "pix") {
       return confirmouSimulacao
         ? ""
-        : "Marque a confirmação de que entende que esta é uma demonstração sem cobrança.";
+        : "Confirme que entendeu que não haverá cobrança real.";
     }
 
     const erros = validarFormularioPagamento({
@@ -327,7 +327,7 @@ export default function TelaSeuPedido({ navigation, route }) {
     if (erro) {
       if (pagamento === "pix") {
         setAvisoValidacao(
-          "Você precisa aceitar os termos da demonstração para continuar."
+          "Confirme que entendeu que não haverá cobrança real para continuar."
         );
       } else {
         setAvisoValidacao(erro);
@@ -629,8 +629,7 @@ export default function TelaSeuPedido({ navigation, route }) {
                     </Text>
                   </View>
                   <Text style={styles.mensagemQrPix}>
-                    Este código é apenas uma representação visual para a
-                    apresentação do TCC.
+                    QR Code ilustrativo. Não escaneie para realizar pagamento.
                   </Text>
                 </View>
                 <View style={styles.blocoPixCopiaCola}>
@@ -653,7 +652,7 @@ export default function TelaSeuPedido({ navigation, route }) {
                       accessibilityLabel={
                         codigoPixCopiado
                           ? "Código Pix copiado"
-                          : "Copiar código Pix demonstrativo"
+                          : "Copiar referência de teste, sem valor de pagamento"
                       }
                     >
                       <Ionicons
@@ -667,8 +666,8 @@ export default function TelaSeuPedido({ navigation, route }) {
                     </TouchableOpacity>
                   </View>
                   <Text style={styles.avisoCodigoFicticio}>
-                    Este código é fictício e utilizado apenas para demonstração.
-                    Nenhum pagamento será realizado.
+                    Referência de teste inválida para pagamento. Nenhuma
+                    transferência será realizada.
                   </Text>
                 </View>
               </View>
@@ -718,7 +717,7 @@ export default function TelaSeuPedido({ navigation, route }) {
                       valor.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ\s]/g, "")
                     )
                   }
-                  placeholder="Nome fictício"
+                  placeholder="Nome para teste"
                   placeholderTextColor="#969696"
                   autoCapitalize="characters"
                   autoCorrect={false}
@@ -871,7 +870,7 @@ export default function TelaSeuPedido({ navigation, route }) {
             )}
 
             <Text style={styles.avisoDemoCompacto}>
-              Use apenas dados fictícios. Os dados do cartão não são salvos nem enviados; nenhuma cobrança será feita.
+              Ambiente de testes: os dados do cartão não são enviados nem salvos; nenhuma cobrança será feita.
             </Text>
 
             {!!erroValidacao && (
@@ -899,7 +898,7 @@ export default function TelaSeuPedido({ navigation, route }) {
                 )}
               </View>
               <Text style={styles.textoTermos}>
-                Li e concordo que esta é uma demonstração e que não haverá cobrança.
+                Confirmo que entendi que este fluxo não realiza cobranças reais.
               </Text>
             </TouchableOpacity>
 
@@ -973,7 +972,7 @@ export default function TelaSeuPedido({ navigation, route }) {
             </Text>
             <Text style={styles.modalMensagem}>
               {codigoPixCopiado
-                ? "O código Pix de demonstração foi copiado com sucesso!"
+                ? "A referência de teste foi copiada. Ela não realiza pagamentos."
                 : avisoValidacao}
             </Text>
             <TouchableOpacity
