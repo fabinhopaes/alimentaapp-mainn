@@ -49,6 +49,11 @@ const ROTAS_SEM_ABA = new Set([
   "TelaConfirmacaoDoacaoSimulada",
 ]);
 
+const ROTAS_COM_MENU = new Set([
+  "Home",
+  "TelaConfirmacaoDoacaoSimulada",
+]);
+
 export default function NavegacaoGlobal({
   navigationRef,
   rotaAtual,
@@ -182,7 +187,7 @@ export default function NavegacaoGlobal({
   return (
     <>
       <View pointerEvents="box-none" style={styles.camada}>
-        {rotaAtual === "Home" && (
+        {ROTAS_COM_MENU.has(rotaAtual) && (
           <Pressable
             onPress={() => setMenuAberto(true)}
             accessibilityRole="button"

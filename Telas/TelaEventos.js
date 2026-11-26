@@ -1,53 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import {
-  ActivityIndicator,
-  View,
-  Text,
   Image,
   ScrollView,
-  TouchableOpacity,
   StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
   useWindowDimensions,
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { collection, onSnapshot } from "firebase/firestore";
-import { db } from "../firebaseDb";
-import { filtrarCampanhas, imagemCampanha } from "../utils/campanhasAdmin";
 
 const VERDE = "#006838";
 const FUNDO = "#FFFCF6";
 
+const DETALHES_EVENTO = [
+  { titulo: "Data", descricao: "15 de novembro de 2026" },
+  { titulo: "Horário", descricao: "A partir das 18hr" },
+  { titulo: "Local", descricao: "Parque Max Feffer Suzano - SP" },
+  { titulo: "Entrada", descricao: "1 kg de alimento não perecível" },
+];
+
 export default function TelaEventos({ navigation }) {
   const { width } = useWindowDimensions();
-  const [campanhas, setCampanhas] = useState([]);
-  const [carregando, setCarregando] = useState(true);
-  const [erro, setErro] = useState("");
-
-  useEffect(() => onSnapshot(
-    collection(db, "campanhas"),
-    (snapshot) => {
-      const lista = snapshot.docs.map((documento) => ({
-        ...documento.data(),
-        id: documento.id,
-      }));
-
-      setCampanhas(
-        filtrarCampanhas(lista).filter(
-          (campanha) => campanha.status === "Ativa"
-        )
-      );
-      setCarregando(false);
-      setErro("");
-    },
-    (falha) => {
-      console.error("Erro ao carregar eventos e campanhas:", falha);
-      setErro("Não foi possível carregar as iniciativas agora.");
-      setCarregando(false);
-    }
-  ), []);
 
   return (
     <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
@@ -69,62 +46,52 @@ export default function TelaEventos({ navigation }) {
             >
               <Ionicons name="chevron-back" size={23} color={VERDE} />
             </TouchableOpacity>
-
             <Text style={styles.titulo}>Eventos</Text>
           </View>
 
           <Text style={styles.subtitulo}>
-            Acompanhe as iniciativas ativas e veja como participar.
+            Participe e ajude a transformar vidas através da música!
           </Text>
 
-          {carregando && (
-            <ActivityIndicator
-              size="large"
-              color={VERDE}
-              style={styles.carregando}
+          <View
+            style={styles.capa}
+            accessibilityLabel="Show solidário com apresentação musical"
+          >
+            <Image
+              source={require("../assets/images/tabIcons/luan santana.avif")}
+              resizeMode="cover"
+              style={StyleSheet.absoluteFill}
+              accessibilityLabel="Luan Santana no palco"
             />
-          )}
+            <View style={styles.badgeEvento}>
+              <Text style={styles.textoBadge}>EVENTO SOLIDÁRIO</Text>
+            </View>
+            <View style={styles.badgeArtista}>
+              <Text style={styles.textoBadge}>LUAN SANTANA</Text>
+            </View>
+          </View>
 
-          {!!erro && <Text style={styles.estado}>{erro}</Text>}
-
-          {!carregando && !erro && campanhas.length === 0 && (
-            <Text style={styles.estado}>
-              Não há iniciativas ativas no momento.
-            </Text>
-          )}
-
-          {campanhas.map((campanha) => (
-            <TouchableOpacity
-              key={campanha.id}
-              style={styles.campanha}
-              onPress={() =>
-                navigation.navigate("TelaDetalheCampanha", { campanha })
-              }
-              accessibilityRole="button"
-              accessibilityLabel={`Abrir ${campanha.nome}`}
-            >
-              {imagemCampanha(campanha) && (
-                <Image
-                  source={imagemCampanha(campanha)}
-                  resizeMode="cover"
-                  style={styles.imagemCampanha}
-                />
-              )}
-              <View style={styles.dadosCampanha}>
-                <Text style={styles.categoria}>{campanha.categoria}</Text>
-                <Text style={styles.nomeCampanha} numberOfLines={2}>
-                  {campanha.nome}
-                </Text>
-                <Text style={styles.descricaoCampanha} numberOfLines={3}>
-                  {campanha.descricao}
-                </Text>
-                <Text style={styles.periodo}>
-                  {campanha.inicio} a {campanha.termino}
-                </Text>
+          <View style={styles.card}>
+            {DETALHES_EVENTO.map((item, index) => (
+              <View
+                key={`${item.titulo}-${index}`}
+                style={[
+                  styles.linhaDetalhe,
+                  index === DETALHES_EVENTO.length - 1 &&
+                    styles.ultimaLinha,
+                ]}
+              >
+                <Text style={styles.rotulo}>{item.titulo}</Text>
+                <Text style={styles.descricao}>{item.descricao}</Text>
               </View>
-              <Ionicons name="chevron-forward" size={20} color={VERDE} />
-            </TouchableOpacity>
-          ))}
+            ))}
+          </View>
+
+          <Text style={styles.textoFinal}>
+            O Show Comunitário do Alimenta+ une música e solidariedade para
+            arrecadar alimentos e apoiar pessoas em vulnerabilidade no Alto
+            Tietê.
+          </Text>
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -142,8 +109,9 @@ const styles = StyleSheet.create({
     maxWidth: 460,
   },
   conteudo: {
-    padding: 20,
-    paddingBottom: 32,
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 26,
   },
   topo: {
     flexDirection: "row",
@@ -161,67 +129,83 @@ const styles = StyleSheet.create({
   titulo: {
     color: VERDE,
     fontFamily: "Poppins_700Bold",
-    fontSize: 22,
+    fontSize: 17,
   },
   subtitulo: {
     color: "#666666",
     fontFamily: "Poppins_400Regular",
-    fontSize: 16,
-    lineHeight: 24,
-    marginTop: 6,
-  },
-  carregando: {
-    marginTop: 32,
-  },
-  estado: {
-    marginTop: 28,
-    color: "#666666",
-    fontFamily: "Poppins_400Regular",
     fontSize: 14,
-    textAlign: "center",
+    lineHeight: 20,
+    marginTop: 2,
   },
-  campanha: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
+  capa: {
+    height: 138,
+    marginHorizontal: 7,
     marginTop: 16,
-    padding: 12,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#D8DDD6",
+    borderRadius: 12,
+    overflow: "hidden",
   },
-  imagemCampanha: {
-    width: 72,
-    height: 72,
-    borderRadius: 6,
-    backgroundColor: "#F0F3ED",
+  badgeEvento: {
+    position: "absolute",
+    top: 10,
+    left: 12,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: 12,
+    backgroundColor: "#E6F0DF",
   },
-  dadosCampanha: {
-    flex: 1,
+  badgeArtista: {
+    position: "absolute",
+    bottom: 8,
+    left: 12,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: 12,
+    backgroundColor: "#E6F0DF",
   },
-  categoria: {
+  textoBadge: {
     color: VERDE,
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 11,
+    fontSize: 10,
   },
-  nomeCampanha: {
-    marginTop: 2,
-    color: "#253226",
+  card: {
+    marginTop: 12,
+    paddingHorizontal: 13,
+    paddingVertical: 6,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#D8DDD6",
+    backgroundColor: "#FFFFFF",
+    elevation: 3,
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.16,
+    shadowRadius: 3,
+  },
+  linhaDetalhe: {
+    paddingVertical: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: "#DDDDDD",
+  },
+  ultimaLinha: {
+    borderBottomWidth: 0,
+  },
+  rotulo: {
+    color: VERDE,
     fontFamily: "Poppins_700Bold",
-    fontSize: 15,
+    fontSize: 13,
   },
-  descricaoCampanha: {
-    marginTop: 2,
+  descricao: {
     color: "#666666",
     fontFamily: "Poppins_400Regular",
     fontSize: 12,
-    lineHeight: 17,
   },
-  periodo: {
-    marginTop: 4,
-    color: "#58645A",
+  textoFinal: {
+    marginTop: 10,
+    color: "#666666",
     fontFamily: "Poppins_400Regular",
     fontSize: 11,
+    lineHeight: 16,
+    textAlign: "center",
   },
 });

@@ -15,7 +15,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { getDownloadURL, getStorage, ref } from "firebase/storage";
 import { doc, onSnapshot } from "firebase/firestore";
-import { IMAGENS_CATALOGO } from "../assets/images/catalogo/mapa";
+import {
+  IMAGENS_PRODUTO,
+  imagemLocalProduto,
+} from "../utils/imagensProdutos";
 import {
   calcularPrecoPromocional,
   obterPrecoAtual,
@@ -52,32 +55,6 @@ function Text({ style, ...props }) {
       style={[estiloSemPeso, { fontFamily: familiaFonte }]}
     />
   );
-}
-
-const IMAGENS = {
-  cesta: require("../assets/images/tabIcons/cesta-basica.png"),
-  arroz: require("../assets/images/tabIcons/arroz.png"),
-  feijao: require("../assets/images/tabIcons/feijao.png"),
-  macarrao: require("../assets/images/tabIcons/macarrao.png"),
-  oleo: require("../assets/images/tabIcons/oleo.png"),
-  acucar: require("../assets/images/tabIcons/acucar.png"),
-  sal: require("../assets/images/tabIcons/sal.png"),
-  farinha: require("../assets/images/tabIcons/farinhadetrigo.png"),
-  cafe: require("../assets/images/tabIcons/cafe.png"),
-  biscoito: require("../assets/images/tabIcons/bolacha.png"),
-  leite: require("../assets/images/tabIcons/leite.png"),
-  agua: require("../assets/images/tabIcons/agua.png"),
-  tomate: require("../assets/images/tabIcons/tomate.png"),
-  cenoura: require("../assets/images/tabIcons/cenoura.png"),
-  alface: require("../assets/images/tabIcons/alface.png"),
-  ...IMAGENS_CATALOGO,
-};
-
-function normalizar(valor) {
-  return String(valor || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
 }
 
 function imagemProduto(produto) {
@@ -138,50 +115,19 @@ function imagemProduto(produto) {
     return { tipo: "remota", valor: imagemRemota };
   }
 
-  if (typeof imagemRemota === "string" && IMAGENS[imagemRemota]) {
-    return { tipo: "local", valor: IMAGENS[imagemRemota] };
+  if (typeof imagemRemota === "string" && IMAGENS_PRODUTO[imagemRemota]) {
+    return { tipo: "local", valor: IMAGENS_PRODUTO[imagemRemota] };
   }
 
-  if (IMAGENS[produto?.imagemChave]) {
+  if (IMAGENS_PRODUTO[produto?.imagemChave]) {
     return {
       tipo: "local",
-      valor: IMAGENS[produto.imagemChave],
+      valor: IMAGENS_PRODUTO[produto.imagemChave],
     };
   }
 
   if (typeof imagemRemota === "string") {
     return { tipo: "storage", valor: imagemRemota };
-  }
-
-  return null;
-}
-
-function imagemLocalPorNome(produto) {
-  if (produto?.adminCadastrado === true || produto?.demonstracao !== true) {
-    return null;
-  }
-
-  if (IMAGENS[produto?.imagemChave]) {
-    return IMAGENS[produto.imagemChave];
-  }
-
-  const nome = normalizar(produto?.nome);
-
-  for (const chave of Object.keys(IMAGENS)) {
-    if (nome && (
-      nome.includes(chave.replace(/-/g, " ")) ||
-      normalizar(chave).includes(nome)
-    )) {
-      return IMAGENS[chave];
-    }
-  }
-
-  if (nome.includes("bolacha")) {
-    return IMAGENS.biscoito;
-  }
-
-  if (nome.includes("farinha")) {
-    return IMAGENS.farinha;
   }
 
   return null;
@@ -291,7 +237,7 @@ export default function TelaDetalhesProduto({
   );
 
   const imagemProdutoAtual = imagemProduto(produto);
-  const imagemFallback = imagemLocalPorNome(produto);
+  const imagemFallback = imagemLocalProduto(produto);
   const caminhoImagemStorage =
     imagemProdutoAtual?.tipo === "storage"
       ? imagemProdutoAtual.valor

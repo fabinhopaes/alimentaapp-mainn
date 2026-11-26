@@ -5,6 +5,10 @@ const path = require("node:path");
 const test = require("node:test");
 const { transformSync } = require("@babel/core");
 
+require.extensions[".png"] = (modulo, arquivo) => {
+  modulo.exports = arquivo;
+};
+
 function carregarModulo(relativo) {
   const caminho = path.resolve(__dirname, "..", relativo);
   const fonte = fs.readFileSync(caminho, "utf8");
@@ -28,6 +32,38 @@ const {
   criarDadosDoacaoAgrupada,
   validarQuantidadeCarrinho,
 } = carregarModulo("utils/carrinhoCalculos.js");
+const carregarOriginal = Module._load;
+Module._load = function (request, parent, isMain) {
+  if (request === "../assets/images/catalogo/mapa") {
+    return { IMAGENS_CATALOGO: { batatas: "batatas.png" } };
+  }
+
+  return carregarOriginal.call(this, request, parent, isMain);
+};
+const {
+  IMAGENS_PRODUTO,
+  imagemLocalProduto,
+} = carregarModulo("utils/imagensProdutos.js");
+Module._load = carregarOriginal;
+
+test("resolve no carrinho a imagem demonstrativa pelo nome e pela chave do produto", () => {
+  assert.equal(
+    imagemLocalProduto({ nome: "Arroz integral", demonstracao: true }),
+    IMAGENS_PRODUTO.arroz
+  );
+  assert.equal(
+    imagemLocalProduto({
+      nome: "Produto sem imagem",
+      imagemChave: "batatas",
+      demonstracao: true,
+    }),
+    IMAGENS_PRODUTO.batatas
+  );
+  assert.equal(
+    imagemLocalProduto({ nome: "Arroz", demonstracao: false }),
+    null
+  );
+});
 
 test("soma subtotal e total de vários produtos com preço por unidade", () => {
   const itens = [

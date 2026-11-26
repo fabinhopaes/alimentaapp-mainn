@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
+  BackHandler,
   ScrollView,
   StyleSheet,
   Text,
@@ -37,14 +38,25 @@ export default function TelaConfirmacaoDoacaoSimulada({
   const parcelado = pagamento === "credito" && Number(parcelas) > 1;
 
   function voltarAoInicio() {
-    const rotas = navigation.getState()?.routeNames || [];
-    if (rotas.includes("Home")) {
-      navigation.navigate("Home");
-      return;
-    }
-
-    navigation.popToTop();
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "Home" }],
+    });
   }
+
+  useEffect(() => {
+    const onBackPress = () => {
+      voltarAoInicio();
+      return true;
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      onBackPress
+    );
+
+    return () => subscription.remove();
+  }, [navigation]);
 
   return (
     <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>

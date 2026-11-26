@@ -13,6 +13,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -20,7 +21,10 @@ import { useFocusEffect } from "@react-navigation/native";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { auth } from "../firebase";
 import { db } from "../firebaseDb";
-import { IMAGENS_CATALOGO } from "../assets/images/catalogo/mapa";
+import {
+  IMAGENS_PRODUTO,
+  imagemLocalProduto,
+} from "../utils/imagensProdutos";
 import {
   alterarQuantidadeNoCarrinho,
   iniciarDoacaoCarrinho,
@@ -53,10 +57,16 @@ function obterImagem(item) {
     return { uri: item.imagemUrl.trim() };
   }
 
-  return IMAGENS_CATALOGO[item.imagemChave] || null;
+  return (
+    IMAGENS_PRODUTO[item.imagemChave] ||
+    imagemLocalProduto(item) ||
+    null
+  );
 }
 
 export default function TelaCarrinhoDoacoes({ navigation }) {
+  const { width } = useWindowDimensions();
+  const tamanhoImagem = Math.max(56, Math.min(88, width * 0.22));
   const uid = auth.currentUser?.uid;
   const [itens, setItens] = useState([]);
   const [carregando, setCarregando] = useState(true);
@@ -449,17 +459,21 @@ export default function TelaCarrinhoDoacoes({ navigation }) {
                 const subtotal = calcularSubtotalItem(item);
                 const quantidadeProcessando =
                   processando === item.produtoId;
+                const estiloImagem = [
+                  styles.imagem,
+                  { width: tamanhoImagem, height: tamanhoImagem },
+                ];
 
                 return (
                   <View key={item.produtoId} style={styles.card}>
                     {imagem ? (
                       <Image
                         source={imagem}
-                        style={styles.imagem}
-                        resizeMode="cover"
+                        style={estiloImagem}
+                        resizeMode="contain"
                       />
                     ) : (
-                      <View style={[styles.imagem, styles.imagemVazia]}>
+                      <View style={[estiloImagem, styles.imagemVazia]}>
                         <Ionicons
                           name="nutrition-outline"
                           size={30}
@@ -657,8 +671,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
   },
   imagem: {
-    width: 76,
-    height: 76,
+    aspectRatio: 1,
+    alignSelf: "center",
+    flexShrink: 0,
     borderRadius: 10,
     backgroundColor: "#F1F1EC",
   },
