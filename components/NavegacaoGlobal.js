@@ -256,13 +256,13 @@ export default function NavegacaoGlobal({
         <View style={styles.fundoModal}>
           <Animated.View
             style={[
-              StyleSheet.absoluteFillObject,
+              StyleSheet.absoluteFill,
               styles.sombraModal,
               { opacity: opacidadeFundo },
             ]}
           >
             <Pressable
-              style={StyleSheet.absoluteFillObject}
+              style={StyleSheet.absoluteFill}
               onPress={fecharMenu}
               accessibilityRole="button"
               accessibilityLabel="Fechar menu"
@@ -376,7 +376,7 @@ export default function NavegacaoGlobal({
 
 const styles = StyleSheet.create({
   camada: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     zIndex: 50,
     elevation: 50,
   },

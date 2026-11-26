@@ -590,7 +590,7 @@ export default function TelaDoacoesAdmin({
           <View style={styles.modalFundo}>
             <Pressable
               style={
-                StyleSheet.absoluteFillObject
+                StyleSheet.absoluteFill
               }
               onPress={() =>
                 setSelecionada(null)

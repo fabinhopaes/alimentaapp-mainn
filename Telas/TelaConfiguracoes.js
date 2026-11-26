@@ -279,7 +279,7 @@ export default function TelaConfiguracoes({
       >
         <View style={styles.modalFundo}>
           <Pressable
-            style={StyleSheet.absoluteFillObject}
+            style={StyleSheet.absoluteFill}
             onPress={() => {
               if (!saindo) {
                 setModalSair(false);
