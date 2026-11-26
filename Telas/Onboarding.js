@@ -10,7 +10,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 
-import { SafeAreaView } from "../components/AreaSegura";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const FUNDO = "#FCF9F3";
 const VERDE = "#006838";
