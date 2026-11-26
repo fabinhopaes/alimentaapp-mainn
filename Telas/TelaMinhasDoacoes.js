@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView } from "../components/AreaSegura";
 import { Ionicons } from "@expo/vector-icons";
 import MenuInferior from "../components/MenuInferior";
 import { auth } from "../firebase";

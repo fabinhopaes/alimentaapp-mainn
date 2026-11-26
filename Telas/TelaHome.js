@@ -21,7 +21,7 @@ import {
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView } from "../components/AreaSegura";
 import { signOut } from "firebase/auth";
 import { IMAGENS_CATALOGO } from "../assets/images/catalogo/mapa";
 import {

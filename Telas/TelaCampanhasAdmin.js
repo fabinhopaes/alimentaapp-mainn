@@ -18,7 +18,7 @@ import {
 
 import {
   SafeAreaView,
-} from "react-native-safe-area-context";
+} from "../components/AreaSegura";
 
 import { Ionicons } from "@expo/vector-icons";
 

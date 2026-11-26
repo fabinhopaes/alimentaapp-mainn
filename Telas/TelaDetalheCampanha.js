@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView } from "../components/AreaSegura";
 import { Ionicons } from "@expo/vector-icons";
 import { imagemCampanha } from "../utils/campanhasAdmin";
 import { auth } from "../firebase";
