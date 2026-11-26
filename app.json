@@ -2,6 +2,7 @@
   "expo": {
     "name": "Alimenta+",
     "slug": "alimenta-mais",
+    "owner": "fabinhopaess-team",
     "scheme": "alimentamais",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -30,7 +31,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "1d6bf758-56e9-443b-a679-ed2a0d75d892"
+        "projectId": "d2fc7e2d-be32-407f-96fa-4bd4b20cbe6e"
       }
     }
   }
