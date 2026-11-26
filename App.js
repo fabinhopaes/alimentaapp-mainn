@@ -5,7 +5,6 @@ import React, {
 } from "react";
 
 import {
-  Platform,
   View,
   Text,
   ActivityIndicator,
@@ -196,15 +195,18 @@ class CapturarErroDeTela extends React.Component {
 // ========================================
 
 export default function App() {
-  const [, erroFontes] = useFonts({
+  const [fontesCarregadas, erroFontes] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
     Poppins_600SemiBold,
     Poppins_700Bold,
   });
 
+  // A sessão começa "carregando" para que nenhuma tela seja
+  // montada antes de o Firebase Auth responder (o limite de
+  // 3 segundos abaixo evita que o app fique preso aqui).
   const [sessao, setSessao] = useState({
-    carregando: false,
+    carregando: true,
     usuario: null,
     admin: false,
   });
@@ -378,8 +380,11 @@ export default function App() {
   // CARREGAMENTO
   // ======================================
 
+  // No APK as fontes Poppins precisam estar carregadas antes
+  // de qualquer tela que use fontFamily ser renderizada.
   if (
-    sessao.carregando
+    sessao.carregando ||
+    (!fontesCarregadas && !erroFontes)
   ) {
     return (
       <SafeAreaProvider>
@@ -404,9 +409,7 @@ export default function App() {
     ? "Home"
     : abrirLoginDireto
     ? "TelaLogin"
-    : Platform.OS === "web"
-    ? "Onboarding"
-    : "TelaCadastro";
+    : "Splash";
 
   const chaveStack = ehAdmin
     ? "admin"
