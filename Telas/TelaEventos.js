@@ -58,9 +58,9 @@ export default function TelaEventos({ navigation }) {
             accessibilityLabel="Show solidário com apresentação musical"
           >
             <Image
-              source={require("../assets/images/tabIcons/luan santana.avif")}
-              resizeMode="cover"
-              style={StyleSheet.absoluteFill}
+              source={require("../assets/images/tabIcons/luan-santana.jpg")}
+              resizeMode="contain"
+              style={styles.imagemCapa}
               accessibilityLabel="Luan Santana no palco"
             />
             <View style={styles.badgeEvento}>
@@ -139,11 +139,16 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   capa: {
-    height: 138,
-    marginHorizontal: 7,
+    width: "100%",
+    aspectRatio: 984 / 422,
+    marginHorizontal: 0,
     marginTop: 16,
     borderRadius: 12,
     overflow: "hidden",
+  },
+  imagemCapa: {
+    width: "100%",
+    height: "100%",
   },
   badgeEvento: {
     position: "absolute",
